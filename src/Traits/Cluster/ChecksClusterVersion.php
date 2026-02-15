@@ -4,14 +4,14 @@ namespace RenokiCo\PhpK8s\Traits\Cluster;
 
 use GuzzleHttp\Exception\ClientException;
 use RenokiCo\PhpK8s\Exceptions\KubernetesAPIException;
-use vierbergenlars\SemVer\version as Semver;
+use Composer\Semver\Comparator;
 
 trait ChecksClusterVersion
 {
     /**
      * The Kubernetes cluster version.
      *
-     * @var \vierbergenlars\SemVer\version|null
+     * @var string|null
      */
     protected $kubernetesVersion;
 
@@ -44,7 +44,7 @@ trait ChecksClusterVersion
 
         $json = @json_decode($response->getBody(), true);
 
-        $this->kubernetesVersion = new Semver($json['gitVersion']);
+        $this->kubernetesVersion = $json['gitVersion'];
     }
 
     /**
@@ -58,7 +58,7 @@ trait ChecksClusterVersion
     {
         $this->loadClusterVersion();
 
-        return Semver::gte(
+        return Comparator::greaterThanOrEqualTo(
             $this->kubernetesVersion, $kubernetesVersion
         );
     }
@@ -74,7 +74,7 @@ trait ChecksClusterVersion
     {
         $this->loadClusterVersion();
 
-        return Semver::lt(
+        return Comparator::lessThan(
             $this->kubernetesVersion, $kubernetesVersion
         );
     }
